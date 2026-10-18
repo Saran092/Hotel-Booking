@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('My Profile')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: nav}"></header>
+<main class="container">
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<div class="medium card">
+  <h1>My Profile</h1>
+  <table class="price-table">
+    <tr><td class="muted" style="width:170px">Full name</td><td th:text="${me.fullName}"></td></tr>
+    <tr><td class="muted">Username</td><td th:text="${me.username}"></td></tr>
+    <tr><td class="muted">Email</td><td th:text="${me.email}"></td></tr>
+    <tr><td class="muted">Mobile</td><td th:text="${me.fullMobile}"></td></tr>
+    <tr><td class="muted">Address</td><td th:text="${me.address}"></td></tr>
+    <tr><td class="muted">Role</td><td th:text="${me.primaryRole.label}"></td></tr>
+    <tr th:if="${me.expertise != null}"><td class="muted">Expertise</td><td th:text="${me.expertise.label}"></td></tr>
+  </table>
+  <div class="actions"><a class="btn" th:href="@{/profile/edit}">Edit Profile</a>
+    <a class="btn secondary" th:href="@{/change-password}">Change Password</a></div>
+</div>
+</main>
+<footer th:replace="~{fragments/layout :: foot}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

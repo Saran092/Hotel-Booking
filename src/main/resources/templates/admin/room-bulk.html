@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Bulk Upload Rooms')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: nav}"></header>
+<main class="container">
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<div class="medium card">
+  <h1>Bulk Upload Rooms</h1>
+  <p>Upload a CSV file with the columns <code>roomNumber, roomType, bedType, pricePerNight, maxOccupancy, status, amenities, description</code>.
+     Separate several amenities with a pipe (|). <a th:href="@{/admin/rooms/bulk/template}">Download the template</a>.</p>
+  <div class="alert error" th:if="${result != null}">
+    <strong>The upload was rejected. No rooms were added.</strong>
+    <ul><li th:each="e : ${result.errors}" th:text="${e}"></li></ul></div>
+  <form th:action="@{/admin/rooms/bulk}" method="post" enctype="multipart/form-data" data-validate>
+    <div class="field"><label class="req" for="file">CSV file</label><input type="file" id="file" name="file" accept=".csv" data-required="Please choose a CSV file."><div class="err"></div></div>
+    <div class="actions"><button class="btn" type="submit">Upload</button><a class="btn secondary" th:href="@{/admin/rooms}">Cancel</a></div>
+  </form>
+</div>
+</main>
+<footer th:replace="~{fragments/layout :: foot}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

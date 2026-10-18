@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Booking Confirmed')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: nav}"></header>
+<main class="container">
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<div class="medium card center">
+  <h1 style="color:var(--ok)">Booking Confirmed!</h1>
+  <p>Thank you, <span th:text="${me.fullName}"></span>. Your payment was successful.</p>
+  <table class="price-table" style="max-width:420px;margin:0 auto;text-align:left">
+    <tr><td class="muted">Booking ID</td><td th:text="${booking.bookingRef}"></td></tr>
+    <tr th:if="${payment != null}"><td class="muted">Transaction ID</td><td th:text="${payment.transactionId}"></td></tr>
+    <tr><td class="muted">Room</td><td th:text="${booking.room.roomType.label} + ' · ' + ${booking.room.roomNumber}"></td></tr>
+    <tr><td class="muted">Stay</td><td th:text="${#temporals.format(booking.checkInDate,'dd MMM yyyy')} + ' → ' + ${#temporals.format(booking.checkOutDate,'dd MMM yyyy')}"></td></tr>
+    <tr><td class="muted">Amount paid</td><td th:text="'₹' + ${#numbers.formatDecimal(booking.amountPaid,1,'COMMA',2,'POINT')}"></td></tr>
+  </table>
+  <p class="muted">A confirmation has been sent to <span th:text="${me.email}"></span>.</p>
+  <div class="actions" style="justify-content:center">
+    <a class="btn" th:href="@{/customer/booking/{id}/receipt(id=${booking.id})}" data-download>Download Receipt</a>
+    <a class="btn secondary" th:href="@{/customer/bookings/{id}(id=${booking.id})}">View Booking</a>
+    <a class="btn secondary" th:href="@{/customer/home}">Home</a>
+  </div>
+</div>
+</main>
+<footer th:replace="~{fragments/layout :: foot}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

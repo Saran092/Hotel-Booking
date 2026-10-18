@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Login')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: nav}"></header>
+<main class="container">
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<div class="narrow card">
+  <h1>Login</h1>
+  <div class="alert error" th:if="${param.error != null and param.error[0] == 'invalid'}">Invalid username or password.</div>
+  <div class="alert error" th:if="${param.error != null and param.error[0] == 'locked'}">Your account is temporarily locked after too many failed login attempts. Please try again later or contact the administrator.</div>
+  <div class="alert error" th:if="${param.error != null and param.error[0] == 'disabled'}">Your account is deactivated. Please contact the administrator.</div>
+  <div class="alert success" th:if="${param.logout != null}">You have been logged out.</div>
+  <form th:action="@{/login}" method="post" data-validate>
+    <div class="field"><label class="req" for="username">Username</label>
+      <input type="text" id="username" name="username" autofocus data-required="Username is required."><div class="err"></div></div>
+    <div class="field"><label class="req" for="password">Password</label>
+      <input type="password" id="password" name="password" data-required="Password is required."><div class="err"></div></div>
+    <div class="actions"><button type="submit" class="btn">Login</button></div>
+  </form>
+  <p style="margin-top:14px"><a th:href="@{/forgot-password}">Forgot password?</a> &middot; <a th:href="@{/register}">New customer? Register</a></p>
+</div>
+</main>
+<footer th:replace="~{fragments/layout :: foot}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Notifications')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: nav}"></header>
+<main class="container">
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<div class="medium card">
+  <h1>Notifications</h1>
+  <p class="muted" th:if="${notifications.isEmpty()}">You have no notifications.</p>
+  <div class="timeline">
+    <div class="item" th:each="n : ${notifications}">
+      <div th:text="${n.message}"></div>
+      <div class="muted" style="font-size:.8rem" th:text="${#temporals.format(n.createdAt,'dd MMM yyyy HH:mm')}"></div>
+    </div>
+  </div>
+</div>
+</main>
+<footer th:replace="~{fragments/layout :: foot}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

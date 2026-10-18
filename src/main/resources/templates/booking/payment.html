@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Payment')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: nav}"></header>
+<main class="container">
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<div class="medium">
+<h1>Payment</h1>
+<div class="alert error" th:if="${paymentError}" th:text="${paymentError}"></div>
+<div class="card">
+  <p><strong th:text="${booking.bookingRef}"></strong> &middot; Room <span th:text="${booking.room.roomNumber}"></span>
+     &middot; <span th:text="${#temporals.format(booking.checkInDate,'dd MMM')} + ' – ' + ${#temporals.format(booking.checkOutDate,'dd MMM yyyy')}"></span></p>
+  <p style="font-size:1.3rem">Amount payable: <strong th:text="'₹' + ${#numbers.formatDecimal(ctx.amount,1,'COMMA',2,'POINT')}"></strong>
+     <span class="muted" th:if="${ctx.modification}">(additional amount for the modification)</span></p>
+  <p class="muted">Complete the payment within <span th:text="${minutes}">10</span> minutes.</p>
+  <form th:action="@{/customer/payment}" method="post" data-validate novalidate>
+    <div class="pay-methods">
+      <label th:each="pm : ${paymentMethods}"><input type="radio" name="method" th:value="${pm}" th:checked="${pm == method}"><span th:text="${pm.label}"></span></label>
+    </div>
+    <div class="err" th:if="${fieldErrors != null and fieldErrors.containsKey('method')}" th:text="${fieldErrors['method']}"></div>
+
+    <div data-method="CREDIT_CARD DEBIT_CARD">
+      <div class="field"><label class="req" for="cardHolder">Cardholder name</label>
+        <input type="text" id="cardHolder" name="cardHolder" th:value="${form.cardHolder}" data-required="Cardholder name is required." th:data-pattern="${rx.CARD_HOLDER}" data-msg="Cardholder name must be 3-50 letters (alphabetic characters only).">
+        <div class="err" th:text="${fieldErrors != null ? fieldErrors['cardHolder'] : null}"></div></div>
+      <div class="grid g2">
+        <div class="field"><label class="req" for="cardNumber">Card number</label>
+          <input type="text" id="cardNumber" name="cardNumber" th:value="${form.cardNumber}" inputmode="numeric" maxlength="16" autocomplete="off" data-required="Card number is required." th:data-pattern="${rx.CARD_NUMBER}" data-msg="Invalid card number.">
+          <div class="err" th:text="${fieldErrors != null ? fieldErrors['cardNumber'] : null}"></div>
+          <div class="hint">16 digits. Demo gateway: a number ending in 0000 is declined.</div></div>
+        <div class="field"><label class="req" for="expiry">Expiry (MM/YY)</label>
+          <input type="text" id="expiry" name="expiry" th:value="${form.expiry}" placeholder="MM/YY" maxlength="5" data-required="Expiry date is required." th:data-pattern="${rx.EXPIRY}" data-msg="Enter the expiry date as MM/YY.">
+          <div class="err" th:text="${fieldErrors != null ? fieldErrors['expiry'] : null}"></div></div>
+        <div class="field"><label class="req" for="cvv">CVV</label>
+          <input type="password" id="cvv" name="cvv" value="" inputmode="numeric" maxlength="4" autocomplete="off" data-required="CVV is required." th:data-pattern="${rx.CVV}" data-msg="Invalid CVV. Please check again.">
+          <div class="err" th:text="${fieldErrors != null ? fieldErrors['cvv'] : null}"></div></div>
+        <div class="field"><label class="req" for="billingAddress">Billing address</label>
+          <input type="text" id="billingAddress" name="billingAddress" th:value="${form.billingAddress}" data-required="Billing address is required." data-pattern="^[\s\S]{5,}$" data-msg="Billing address must be at least 5 characters.">
+          <div class="err" th:text="${fieldErrors != null ? fieldErrors['billingAddress'] : null}"></div></div>
+      </div>
+    </div>
+
+    <div data-method="UPI">
+      <div class="field"><label class="req" for="upiId">UPI ID</label>
+        <input type="text" id="upiId" name="upiId" th:value="${form.upiId}" placeholder="name@bank" data-required="UPI ID is required." th:data-pattern="${rx.UPI}" data-msg="Enter a valid UPI ID (for example name@bank).">
+        <div class="err" th:text="${fieldErrors != null ? fieldErrors['upiId'] : null}"></div></div>
+    </div>
+
+    <div data-method="WALLET">
+      <div class="field"><label class="req" for="wallet">Wallet</label>
+        <select id="wallet" name="wallet" data-required="Select a wallet."><option value="">-- Select --</option>
+          <option th:each="w : ${wallets}" th:value="${w}" th:text="${w}" th:selected="${w == form.wallet}"></option></select>
+        <div class="err" th:text="${fieldErrors != null ? fieldErrors['wallet'] : null}"></div></div>
+    </div>
+
+    <div data-method="NET_BANKING">
+      <div class="field"><label class="req" for="bank">Bank</label>
+        <select id="bank" name="bank" data-required="Select your bank."><option value="">-- Select --</option>
+          <option th:each="b : ${banks}" th:value="${b}" th:text="${b}" th:selected="${b == form.bank}"></option></select>
+        <div class="err" th:text="${fieldErrors != null ? fieldErrors['bank'] : null}"></div></div>
+    </div>
+
+    <div class="actions"><button type="submit" class="btn ok">Pay Now</button>
+      <a class="btn secondary" th:href="@{/customer/bookings}">Cancel</a></div>
+  </form>
+</div></div>
+</main>
+<footer th:replace="~{fragments/layout :: foot}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

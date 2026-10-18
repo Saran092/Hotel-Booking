@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('User')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: nav}"></header>
+<main class="container">
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<div class="medium card">
+  <h1 th:text="${account != null} ? 'Edit User ' + ${account.username} : 'Add User'"></h1>
+  <form th:action="${account != null} ? @{/admin/users/{id}/edit(id=${account.id})} : @{/admin/users/new}" th:object="${form}" method="post" data-validate novalidate>
+    <div class="alert error" th:each="e : ${#fields.globalErrors()}" th:text="${e}"></div>
+    <div class="field"><label class="req" for="username">Username</label><input type="text" th:field="*{username}" th:readonly="${account != null}" data-required="Username is required." th:data-pattern="${rx.USERNAME}" th:data-msg="${rx.MSG_USERNAME}"><div class="err" th:errors="*{username}"></div></div>
+<div class="field"><label class="req" for="fullName">Full name</label><input type="text" th:field="*{fullName}" data-required="Full name is required." th:data-pattern="${rx.PROFILE_NAME}" th:data-msg="${rx.MSG_NAME}"><div class="err" th:errors="*{fullName}"></div></div><div class="field"><label class="req" for="email">Email</label><input type="email" th:field="*{email}" data-required="Email is required." th:data-pattern="${rx.EMAIL}" th:data-msg="${rx.MSG_EMAIL}"><div class="err" th:errors="*{email}"></div></div>
+    <div class="field"><label class="req">Roles</label><div class="checks"><label th:each="r : ${allRoles}"><input type="checkbox" th:field="*{roles}" th:value="${r}"><span th:text="${r.label}"></span></label></div><div class="err" th:errors="*{roles}"></div></div>
+    <div class="field"><label for="expertise">Staff expertise (for staff accounts)</label><select th:field="*{expertise}"><option value="">-- None --</option><option th:each="x : ${expertises}" th:value="${x}" th:text="${x.label}"></option></select><div class="err" th:errors="*{expertise}"></div></div>
+    <div class="field checks" th:if="${account != null}"><label><input type="checkbox" th:field="*{active}"> Account active</label></div>
+    <p class="hint" th:if="${account == null}">A temporary password is generated automatically. The user must change it at first login.</p>
+    <div class="actions"><button class="btn" type="submit" data-enable-when-valid>Save</button><a class="btn secondary" th:href="@{/admin/users}">Cancel</a></div>
+  </form>
+</div>
+</main>
+<footer th:replace="~{fragments/layout :: foot}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

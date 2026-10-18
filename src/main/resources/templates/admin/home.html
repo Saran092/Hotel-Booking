@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: nav}"></header>
+<main class="container">
+<div th:replace="~{fragments/layout :: flash}"></div>
+<h1>Admin Dashboard</h1><div class="grid g4">
+  <div class="card stat"><div class="n" th:text="${stats.today}">0</div><div class="l">Bookings today</div></div>
+  <div class="card stat"><div class="n" th:text="${stats.week}">0</div><div class="l">Last 7 days</div></div>
+  <div class="card stat"><div class="n" th:text="${stats.month}">0</div><div class="l">This month</div></div>
+  <div class="card stat"><div class="n"><span th:text="${stats.availableRooms}"></span> / <span th:text="${stats.totalRooms}"></span></div><div class="l">Rooms available now</div></div>
+</div>
+<div class="grid g2">
+  <div class="card"><h2>Bookings – last 7 days</h2><div class="bars"><div class="row" th:each="e : ${stats.daily}">
+  <div class="lab" th:text="${e.key}"></div>
+  <div class="track"><div class="fill" th:style="'width:' + ${e.value.doubleValue() * 100 / stats.maxDaily.doubleValue()} + '%'"></div></div>
+  <div class="val" th:text="${e.value}"></div></div></div></div>
+  <div class="card"><h2>Bookings by status</h2><div class="bars"><div class="row" th:each="e : ${stats.byStatus}">
+  <div class="lab" th:text="${e.key}"></div>
+  <div class="track"><div class="fill" th:style="'width:' + ${e.value.doubleValue() * 100 / stats.maxStatus.doubleValue()} + '%'"></div></div>
+  <div class="val" th:text="${e.value}"></div></div></div></div>
+</div>
+<div class="grid g3">
+  <a class="card stat" th:href="@{/admin/complaints}"><div class="n" th:text="${stats.openComplaints}">0</div><div class="l">Open / escalated complaints</div></a>
+  <a class="card stat" th:href="@{/admin/bills}"><div class="n" th:text="${stats.pendingBills}">0</div><div class="l">Pending bills</div></a>
+  <div class="card"><h2>Quick links</h2><div class="actions">
+    <a class="btn small" th:href="@{/admin/rooms/new}">Add Room</a><a class="btn small" th:href="@{/admin/reservations/new}">New Reservation</a>
+    <a class="btn small" th:href="@{/admin/users/new}">Add User</a><a class="btn small" th:href="@{/admin/bills/new}">New Bill</a></div></div>
+</div>
+</main>
+<footer th:replace="~{fragments/layout :: foot}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

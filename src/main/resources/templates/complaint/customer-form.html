@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Complaint')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: nav}"></header>
+<main class="container">
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<div class="medium card">
+  <h1 th:text="${editing ? 'Edit Complaint ' + complaint.reference : 'Raise a Complaint'}"></h1>
+  <form th:action="${editing} ? @{/customer/complaints/{id}/edit(id=${complaint.id})} : @{/customer/complaints/new}" th:object="${form}" method="post" data-validate novalidate>
+    <div class="alert error" th:if="${#fields.hasErrors('*')}">Please correct the highlighted fields.</div>
+    <div class="alert error" th:each="e : ${#fields.globalErrors()}" th:text="${e}"></div>
+<div class="field"><label class="req" for="category">Category</label><select th:field="*{category}" data-required="Category is required."><option value="">-- Select --</option><option th:each="o : ${complaintCategories}" th:value="${o}" th:text="${o.label}"></option></select><div class="err" th:errors="*{category}"></div></div>
+    <div class="field"><label for="bookingId">Related booking (optional)</label>
+      <select th:field="*{bookingId}"><option value="">-- None --</option>
+        <option th:each="b : ${myBookings}" th:value="${b.id}" th:text="${b.bookingRef} + ' · Room ' + ${b.room.roomNumber} + ' · ' + ${#temporals.format(b.checkInDate,'dd MMM yyyy')}"></option></select>
+      <div class="err" th:errors="*{bookingId}"></div></div>
+<div class="field"><label class="req" for="title">Title</label><input type="text" th:field="*{title}" data-required="Title is required." data-pattern="^[\s\S]{10,100}$" data-msg="Title must be between 10 and 100 characters." maxlength="100"><div class="err" th:errors="*{title}"></div><div class="hint">10 to 100 characters</div></div><div class="field"><label class="req" for="description">Description</label><textarea th:field="*{description}" data-required="Description is required." maxlength="500" data-pattern="^[\s\S]{20,500}$" data-msg="Description must be between 20 and 500 characters."></textarea><div class="err" th:errors="*{description}"></div><div class="hint">20 to 500 characters</div></div><div class="field"><label class="req" for="contactPreference">Preferred contact method</label><select th:field="*{contactPreference}" data-required="Preferred contact method is required."><option value="">-- Select --</option><option th:each="o : ${contactPreferences}" th:value="${o}" th:text="${o.label}"></option></select><div class="err" th:errors="*{contactPreference}"></div></div>
+    <div class="actions"><button class="btn" type="submit" data-enable-when-valid th:text="${editing ? 'Save Changes' : 'Submit Complaint'}">Submit</button>
+      <a class="btn secondary" th:href="@{/customer/complaints}">Cancel</a></div>
+  </form>
+</div>
+</main>
+<footer th:replace="~{fragments/layout :: foot}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

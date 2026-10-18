@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Complaint')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: nav}"></header>
+<main class="container">
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<h1>Complaint <span th:text="${complaint.reference}"></span> <span class="tag" th:classappend="${complaint.status}" th:text="${complaint.status.label}"></span> <span class="tag" th:classappend="${complaint.priority}" th:text="${complaint.priority.label}"></span></h1>
+<div class="grid g2">
+ <div class="card"><h2 th:text="${complaint.title}"></h2>
+  <table class="price-table">
+    <tr><td class="muted" style="width:150px">Customer</td><td th:text="${complaint.customer.fullName} + ' (' + ${complaint.customer.fullMobile} + ', ' + ${complaint.customer.email} + ')'"></td></tr>
+    <tr><td class="muted">Category</td><td th:text="${complaint.category.label}"></td></tr>
+    <tr><td class="muted">Submitted</td><td th:text="${#temporals.format(complaint.submittedAt,'dd MMM yyyy HH:mm')}"></td></tr>
+    <tr><td class="muted">Booking</td><td th:text="${complaint.booking != null} ? ${complaint.booking.bookingRef} + ' (Room ' + ${complaint.booking.room.roomNumber} + ')' : '-'"></td></tr>
+    <tr><td class="muted">Contact via</td><td th:text="${complaint.contactPreference.label}"></td></tr>
+    <tr><td class="muted">Assigned to</td><td th:text="${complaint.assignedTo != null} ? ${complaint.assignedTo.fullName} : 'Unassigned'"></td></tr>
+    <tr><td class="muted">Expected resolution</td><td th:text="${complaint.expectedResolutionDate != null} ? ${#temporals.format(complaint.expectedResolutionDate,'dd MMM yyyy')} : '-'"></td></tr>
+  </table>
+  <p style="white-space:pre-wrap" th:text="${complaint.description}"></p>
+  <form th:action="@{|${base}/${complaint.id}/priority|}" method="post" class="actions">
+    <select name="priority" style="width:auto"><option th:each="p : ${complaintPriorities}" th:value="${p}" th:text="${p.label}" th:selected="${p == complaint.priority}"></option></select>
+    <button class="btn small secondary" type="submit">Set Priority</button>
+  </form>
+  <form th:if="${admin}" th:action="@{|${base}/${complaint.id}/assign|}" method="post" class="actions">
+    <select name="staffId" style="width:auto" data-required="Select a staff member"><option value="">-- Reassign to --</option>
+      <option th:each="s : ${staffList}" th:value="${s.id}" th:text="${s.fullName} + ' (' + ${s.expertise != null ? s.expertise.label : 'General'} + ')'"></option></select>
+    <button class="btn small secondary" type="submit">Assign</button>
+  </form>
+ </div>
+ <div class="card"><h2>Add Update</h2>
+  <form th:action="@{|${base}/${complaint.id}/action|}" th:object="${actionForm}" method="post" data-validate novalidate>
+    <div class="alert error" th:each="e : ${#fields.globalErrors()}" th:text="${e}"></div>
+<div class="field"><label class="req" for="type">Entry type</label><select th:field="*{type}" data-required="Entry type is required."><option value="">-- Select --</option><option th:each="o : ${actionTypes}" th:value="${o}" th:text="${o.label}"></option></select><div class="err" th:errors="*{type}"></div></div><div class="field"><label class="req" for="details">Details</label><textarea th:field="*{details}" data-required="Details is required." maxlength="1000"></textarea><div class="err" th:errors="*{details}"></div></div>
+    <div class="field"><label for="newStatus">Change status (optional)</label>
+      <select th:field="*{newStatus}"><option value="">-- Keep current --</option><option th:each="o : ${complaintStatuses}" th:value="${o}" th:text="${o.label}"></option></select>
+      <div class="err" th:errors="*{newStatus}"></div></div>
+    <div class="hint">Communication and Resolution entries are visible to the customer. Internal notes and investigation entries are not.</div>
+    <div class="actions"><button class="btn" type="submit">Save Update</button></div>
+  </form>
+ </div>
+</div>
+<div class="card"><h2>History</h2>
+  <p class="muted" th:if="${#lists.isEmpty(complaint.actions)}">No entries yet.</p>
+  <div class="timeline"><div class="item" th:each="a : ${complaint.actions}">
+    <strong th:text="${a.type.label}"></strong>
+    <span class="muted" th:text="'· ' + ${a.actor.fullName} + ' · ' + ${#temporals.format(a.createdAt,'dd MMM yyyy HH:mm')}"></span>
+    <span class="tag" th:unless="${a.visibleToCustomer}">internal</span>
+    <div style="white-space:pre-wrap" th:text="${a.details}"></div>
+  </div></div>
+</div>
+<a class="btn secondary" th:href="@{${base}}">Back to list</a>
+</main>
+<footer th:replace="~{fragments/layout :: foot}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

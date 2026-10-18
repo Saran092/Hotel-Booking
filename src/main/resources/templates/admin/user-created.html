@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Temporary Password')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: nav}"></header>
+<main class="container">
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<div class="medium card center">
+  <h1 th:text="${reset} ? 'Password reset' : 'User created'"></h1>
+  <p>Account: <strong th:text="${account.username}"></strong> (<span th:text="${account.fullName}"></span>)</p>
+  <p>Temporary password – share it securely. It is shown only once:</p>
+  <p><span class="pwbox" th:text="${tempPassword}"></span></p>
+  <p class="muted">The user will be asked to choose a new password at the next login. A copy of these details has been sent to <span th:text="${account.email}"></span>.</p>
+  <a class="btn" th:href="@{/admin/users}">Back to Users</a>
+</div>
+</main>
+<footer th:replace="~{fragments/layout :: foot}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

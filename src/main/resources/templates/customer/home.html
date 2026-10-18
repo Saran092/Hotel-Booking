@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Home')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: nav}"></header>
+<main class="container">
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<h1>Welcome, <span th:text="${me.fullName}"></span></h1>
+<div class="grid g3">
+  <div class="card stat"><div class="n" th:text="${upcomingCount}">0</div><div class="l">Upcoming bookings</div></div>
+  <a class="card" th:href="@{/customer/rooms/search}"><h2>Book a Room</h2><p class="muted">Search availability and reserve your stay.</p></a>
+  <a class="card" th:href="@{/customer/bookings}"><h2>My Bookings</h2><p class="muted">View, modify, cancel or download invoices.</p></a>
+  <a class="card" th:href="@{/customer/complaints}"><h2>Complaints</h2><p class="muted">Raise a complaint and track its progress.</p></a>
+  <a class="card" th:href="@{/profile}"><h2>My Profile</h2><p class="muted">Update your contact details.</p></a>
+  <a class="card" th:href="@{/notifications}"><h2>Notifications</h2><p class="muted" th:text="${unreadCount} + ' recent updates'"></p></a>
+</div>
+</main>
+<footer th:replace="~{fragments/layout :: foot}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

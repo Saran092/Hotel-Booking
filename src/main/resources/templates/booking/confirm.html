@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Confirm Booking')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: nav}"></header>
+<main class="container">
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<h1>Confirm Your Booking</h1>
+<div class="grid g2">
+ <div class="card">
+  <h2>Stay Details</h2>
+  <table class="price-table">
+    <tr><td class="muted">Room</td><td><span th:text="${quote.room.roomType.label}"></span> &middot; <span th:text="${quote.room.roomNumber}"></span></td></tr>
+    <tr><td class="muted">Check-in</td><td th:text="${#temporals.format(quote.checkIn,'dd MMM yyyy')} + ' (from 14:00)'"></td></tr>
+    <tr><td class="muted">Check-out</td><td th:text="${#temporals.format(quote.checkOut,'dd MMM yyyy')} + ' (until 11:00)'"></td></tr>
+    <tr><td class="muted">Guests</td><td th:text="${req.adults} + ' adult(s), ' + ${req.children} + ' child(ren)'"></td></tr>
+    <tr><td class="muted">Max occupancy</td><td th:text="${quote.room.maxOccupancy}"></td></tr>
+  </table>
+  <h2 style="margin-top:14px">Price Breakdown</h2>
+  <table class="price-table">
+    <tr><td th:text="${quote.nights} + ' night(s) × ' + '₹' + ${#numbers.formatDecimal(quote.nightlyRate,1,'COMMA',2,'POINT')}"></td><td class="right" th:text="'₹' + ${#numbers.formatDecimal(quote.base,1,'COMMA',2,'POINT')}"></td></tr>
+    <tr><td>GST</td><td class="right" th:text="'₹' + ${#numbers.formatDecimal(quote.gst,1,'COMMA',2,'POINT')}"></td></tr>
+    <tr><td>Service charge</td><td class="right" th:text="'₹' + ${#numbers.formatDecimal(quote.service,1,'COMMA',2,'POINT')}"></td></tr>
+    <tr class="total"><td>Total</td><td class="right" th:text="'₹' + ${#numbers.formatDecimal(quote.total,1,'COMMA',2,'POINT')}"></td></tr>
+  </table>
+ </div>
+ <div class="card">
+  <h2>Payment</h2>
+  <form th:action="@{/customer/booking/pay}" th:object="${req}" method="post" data-validate novalidate>
+    <input type="hidden" th:field="*{roomId}"><input type="hidden" th:field="*{checkIn}">
+    <input type="hidden" th:field="*{checkOut}"><input type="hidden" th:field="*{adults}"><input type="hidden" th:field="*{children}">
+    <div class="field"><label for="specialRequests">Special requests</label><textarea th:field="*{specialRequests}" maxlength="300" placeholder="Optional (max 300 characters)"></textarea><div class="err" th:errors="*{specialRequests}"></div></div><div class="field"><label class="req" for="paymentMethod">Payment method</label><select th:field="*{paymentMethod}" data-required="Payment method is required."><option value="">-- Select --</option><option th:each="o : ${paymentMethods}" th:value="${o}" th:text="${o.label}"></option></select><div class="err" th:errors="*{paymentMethod}"></div></div>
+    <div class="actions"><button type="submit" class="btn" data-enable-when-valid>Proceed to Payment</button>
+    <a class="btn secondary" th:href="@{/customer/rooms/search}">Back</a></div>
+  </form>
+  <p class="muted" style="font-size:.85rem;margin-top:12px">Your room is held for <span th:text="${hotel.paymentSessionMinutes}">10</span> minutes once you proceed to payment.
+  Free cancellation up to 48 hours before check-in; 50% refund within 24–48 hours; no refund after that.</p>
+ </div>
+</div>
+</main>
+<footer th:replace="~{fragments/layout :: foot}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

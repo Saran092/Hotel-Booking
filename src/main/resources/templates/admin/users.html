@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Users')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: nav}"></header>
+<main class="container">
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<h1>Users <a class="btn small" style="float:right" th:href="@{/admin/users/new}">Add User</a></h1>
+<div class="card"><form th:action="@{/admin/users}" th:object="${filter}" method="get" novalidate><div class="filters">
+<div class="field"><label>Search (name / username / email)</label><input type="text" th:field="*{q}"><div class="err" th:errors="*{q}"></div></div><div class="field"><label>Role</label><select th:field="*{role}"><option value="">All</option><option th:each="o : ${allRoles}" th:value="${o}" th:text="${o.label}"></option></select></div>
+<div class="field"><label>Status</label><select th:field="*{status}"><option value="">All</option><option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option></select></div>
+</div><div class="actions"><button class="btn" type="submit">Search</button><a class="btn secondary" th:href="@{/admin/users}">Reset</a></div></form></div>
+<p class="muted" th:if="${page.empty}">No users found.</p>
+<div class="table-wrap" th:unless="${page.empty}"><table><tr><th th:replace="~{fragments/layout :: sorth(${lq}, 'username', 'Username')}"></th><th th:replace="~{fragments/layout :: sorth(${lq}, 'name', 'Name')}"></th><th>Email</th><th th:replace="~{fragments/layout :: sorth(${lq}, 'role', 'Role')}"></th><th th:replace="~{fragments/layout :: sorth(${lq}, 'status', 'Status')}"></th><th></th></tr>
+  <tr th:each="u : ${page.items}">
+    <td th:text="${u.username}"></td><td th:text="${u.fullName}"></td><td th:text="${u.email}"></td>
+    <td><span th:each="r,st : ${u.roles}" th:text="${r.label} + ${st.last ? '' : ', '}"></span><span class="muted" th:if="${u.expertise != null}" th:text="' (' + ${u.expertise.label} + ')'"></span></td>
+    <td><span class="tag" th:classappend="${u.active ? 'ACTIVE' : 'INACTIVE'}" th:text="${u.active ? 'Active' : 'Inactive'}"></span><span class="tag OPEN" th:if="${u.locked}">Locked</span></td>
+    <td style="white-space:nowrap"><a class="btn small secondary" th:href="@{/admin/users/{id}/edit(id=${u.id})}">Edit</a>
+      <form th:action="@{/admin/users/{id}/reset-password(id=${u.id})}" method="post" style="display:inline" data-confirm="Generate a new temporary password for this user?"><button class="btn small secondary" type="submit">Reset password</button></form>
+      <form th:action="@{/admin/users/{id}/status(id=${u.id})}" method="post" style="display:inline"><input type="hidden" name="active" th:value="${!u.active}"><button class="btn small" th:classappend="${u.active ? 'danger' : 'ok'}" type="submit" th:text="${u.active ? 'Deactivate' : 'Activate'}"></button></form></td>
+  </tr></table></div>
+<div th:replace="~{fragments/layout :: pager(${page}, ${lq})}"></div>
+</main>
+<footer th:replace="~{fragments/layout :: foot}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Booking Details')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: nav}"></header>
+<main class="container">
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<h1>Booking <span th:text="${booking.bookingRef}"></span> <span class="tag" th:classappend="${booking.effectiveStatus}" th:text="${booking.effectiveStatus.label}"></span></h1>
+<div class="grid g2">
+ <div class="card"><h2>Stay</h2>
+  <table class="price-table">
+    <tr><td class="muted">Room</td><td th:text="${booking.room.roomType.label} + ' · ' + ${booking.room.roomNumber} + ' (' + ${booking.room.bedType} + ')'"></td></tr>
+    <tr><td class="muted">Check-in</td><td th:text="${#temporals.format(booking.checkInDate,'dd MMM yyyy')} + ' (from 14:00)'"></td></tr>
+    <tr><td class="muted">Check-out</td><td th:text="${#temporals.format(booking.checkOutDate,'dd MMM yyyy')} + ' (until 11:00)'"></td></tr>
+    <tr><td class="muted">Nights</td><td th:text="${booking.nights}"></td></tr>
+    <tr><td class="muted">Guests</td><td th:text="${booking.adults} + ' adult(s), ' + ${booking.children} + ' child(ren)'"></td></tr>
+    <tr th:if="${booking.specialRequests}"><td class="muted">Requests</td><td th:text="${booking.specialRequests}"></td></tr>
+    <tr><td class="muted">Booked on</td><td th:text="${#temporals.format(booking.createdAt,'dd MMM yyyy HH:mm')}"></td></tr>
+    <tr th:if="${booking.canceledAt}"><td class="muted">Canceled on</td><td th:text="${#temporals.format(booking.canceledAt,'dd MMM yyyy HH:mm')}"></td></tr>
+  </table></div>
+ <div class="card"><h2>Payment</h2>
+  <table class="price-table">
+    <tr><td th:text="${booking.nights} + ' night(s) × ' + '₹' + ${#numbers.formatDecimal(booking.nightlyRate,1,'COMMA',2,'POINT')}"></td><td class="right" th:text="'₹' + ${#numbers.formatDecimal(booking.baseAmount,1,'COMMA',2,'POINT')}"></td></tr>
+    <tr><td>GST</td><td class="right" th:text="'₹' + ${#numbers.formatDecimal(booking.gstAmount,1,'COMMA',2,'POINT')}"></td></tr>
+    <tr><td>Service charge</td><td class="right" th:text="'₹' + ${#numbers.formatDecimal(booking.serviceChargeAmount,1,'COMMA',2,'POINT')}"></td></tr>
+    <tr class="total"><td>Total</td><td class="right" th:text="'₹' + ${#numbers.formatDecimal(booking.totalAmount,1,'COMMA',2,'POINT')}"></td></tr>
+    <tr><td class="muted">Paid</td><td class="right" th:text="'₹' + ${#numbers.formatDecimal(booking.amountPaid,1,'COMMA',2,'POINT')}"></td></tr>
+    <tr th:if="${booking.refundAmount.signum() > 0}"><td class="muted">Refund</td><td class="right" th:text="'₹' + ${#numbers.formatDecimal(booking.refundAmount,1,'COMMA',2,'POINT')}"></td></tr>
+    <tr><td class="muted">Payment status</td><td class="right"><span class="tag" th:classappend="${booking.paymentStatus}" th:text="${booking.paymentStatus.label}"></span></td></tr>
+  </table></div>
+</div>
+<div class="alert info" th:if="${booking.status.name() == 'PENDING_PAYMENT'}">This booking is waiting for payment and will be released if payment is not completed.</div>
+<div class="actions">
+  <a class="btn" th:if="${booking.paid}" th:href="@{/customer/bookings/{id}/invoice(id=${booking.id})}" data-download>Download Invoice</a>
+  <a class="btn secondary" th:if="${booking.status.name() == 'CONFIRMED' and modifiable}" th:href="@{/customer/bookings/{id}/modify(id=${booking.id})}">Modify Booking</a>
+  <a class="btn danger" th:if="${canceled.allowed}" th:href="@{/customer/bookings/{id}/cancel(id=${booking.id})}">Cancel Booking</a>
+  <a class="btn secondary" th:href="@{/customer/complaints/new}">Raise a Complaint</a>
+  <a class="btn secondary" th:href="@{/customer/bookings}">Back</a>
+</div>
+</main>
+<footer th:replace="~{fragments/layout :: foot}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

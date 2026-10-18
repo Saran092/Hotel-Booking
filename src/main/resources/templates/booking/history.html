@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('My Bookings')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: nav}"></header>
+<main class="container">
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<h1>My Bookings</h1>
+<div class="card"><h2>Upcoming</h2>
+  <p class="muted" th:if="${upcoming.isEmpty()}">No upcoming bookings. <a th:href="@{/customer/rooms/search}">Book a room</a></p>
+  <div th:unless="${upcoming.isEmpty()}">
+<div class="table-wrap"><table>
+  <tr><th>Booking ID</th><th>Room</th><th>Check-in</th><th>Check-out</th><th>Status</th><th>Total</th><th></th></tr>
+  <tr th:each="b : ${upcoming}">
+    <td th:text="${b.bookingRef}"></td>
+    <td th:text="${b.room.roomType.label} + ' · ' + ${b.room.roomNumber}"></td>
+    <td th:text="${#temporals.format(b.checkInDate,'dd MMM yyyy')}"></td>
+    <td th:text="${#temporals.format(b.checkOutDate,'dd MMM yyyy')}"></td>
+    <td><span class="tag" th:classappend="${b.effectiveStatus}" th:text="${b.effectiveStatus.label}"></span></td>
+    <td th:text="'₹' + ${#numbers.formatDecimal(b.totalAmount,1,'COMMA',2,'POINT')}"></td>
+    <td><a class="btn small secondary" th:href="@{/customer/bookings/{id}(id=${b.id})}">View</a></td>
+  </tr>
+</table></div></div></div>
+<div class="card"><h2>Past &amp; Canceled</h2>
+  <p class="muted" th:if="${past.isEmpty()}">No past bookings yet.</p>
+  <div th:unless="${past.isEmpty()}">
+<div class="table-wrap"><table>
+  <tr><th>Booking ID</th><th>Room</th><th>Check-in</th><th>Check-out</th><th>Status</th><th>Total</th><th></th></tr>
+  <tr th:each="b : ${past}">
+    <td th:text="${b.bookingRef}"></td>
+    <td th:text="${b.room.roomType.label} + ' · ' + ${b.room.roomNumber}"></td>
+    <td th:text="${#temporals.format(b.checkInDate,'dd MMM yyyy')}"></td>
+    <td th:text="${#temporals.format(b.checkOutDate,'dd MMM yyyy')}"></td>
+    <td><span class="tag" th:classappend="${b.effectiveStatus}" th:text="${b.effectiveStatus.label}"></span></td>
+    <td th:text="'₹' + ${#numbers.formatDecimal(b.totalAmount,1,'COMMA',2,'POINT')}"></td>
+    <td><a class="btn small secondary" th:href="@{/customer/bookings/{id}(id=${b.id})}">View</a></td>
+  </tr>
+</table></div></div></div>
+</main>
+<footer th:replace="~{fragments/layout :: foot}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

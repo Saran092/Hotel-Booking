@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Bill')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: nav}"></header>
+<main class="container">
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<div class="card">
+  <h1 th:text="${bill != null} ? 'Edit Bill ' + ${bill.billRef} : 'New Bill'"></h1>
+  <form th:action="${bill != null} ? @{/admin/bills/{id}/edit(id=${bill.id})} : @{/admin/bills/new}" th:object="${form}" method="post" data-validate novalidate>
+    <div class="alert error" th:if="${#fields.hasErrors('*')}"><ul style="margin:0;padding-left:18px"><li th:each="e : ${#fields.errors('*')}" th:text="${e}"></li></ul></div>
+    <div class="grid g3">
+      <div class="field"><label class="req" for="customerId">Customer</label><select th:field="*{customerId}" data-required="Select a customer."><option value="">-- Select --</option>
+        <option th:each="c : ${customers}" th:value="${c.id}" th:text="${c.fullName} + ' (' + ${c.username} + ')'"></option></select></div>
+      <div class="field"><label for="bookingId">Booking number (optional)</label><input type="number" th:field="*{bookingId}" min="1"><div class="hint">The # shown beside the reservation ID.</div></div>
+      <div class="field"><label class="req" for="paymentStatus">Payment status</label><select th:field="*{paymentStatus}"><option th:each="s : ${paymentStatuses}" th:value="${s}" th:text="${s.label}"></option></select></div>
+    </div>
+    <h2>Line items</h2>
+    <datalist id="service-list"><option th:each="s : ${serviceList}" th:value="${s}"></option></datalist>
+    <div class="table-wrap"><table><thead><tr><th>Category</th><th>Description</th><th>Date / time</th><th>Qty</th><th>Unit price</th><th>Tax %</th><th>Discount</th><th>Line total</th><th></th></tr></thead>
+    <tbody id="bill-items">
+      <th:block th:each="it : ${form.items}"><tr class="item-row">
+ <td><select data-field="category" name="items[0].category" style="min-width:130px"><option th:each="c : ${billCategories}" th:value="${c}" th:text="${c.label}" th:selected="${c == it.category}"></option></select></td>
+ <td><input type="text" list="service-list" data-field="description" name="items[0].description" th:value="${it.description}" maxlength="100"></td>
+ <td><input type="datetime-local" data-field="serviceDateTime" name="items[0].serviceDateTime" th:value="${it.serviceDateTime != null ? #strings.replace(#temporals.format(it.serviceDateTime, 'yyyy-MM-dd HH:mm'),' ','T') : null}"></td>
+ <td><input type="number" data-field="quantity" name="items[0].quantity" min="1" th:value="${it.quantity}" style="width:70px"></td>
+ <td><input type="number" data-field="unitPrice" name="items[0].unitPrice" step="0.01" min="0" th:value="${it.unitPrice}" style="width:100px"></td>
+ <td><input type="number" data-field="taxPercent" name="items[0].taxPercent" step="0.01" min="0" max="100" th:value="${it.taxPercent}" style="width:70px"></td>
+ <td><input type="number" data-field="discount" name="items[0].discount" step="0.01" min="0" th:value="${it.discount}" style="width:90px"></td>
+ <td class="line-total right">0.00</td>
+ <td><button type="button" class="btn small danger remove-item">✕</button></td>
+</tr></th:block>
+      <th:block th:if="${#lists.isEmpty(form.items)}"><tr class="item-row">
+ <td><select data-field="category" name="items[0].category" style="min-width:130px"><option th:each="c : ${billCategories}" th:value="${c}" th:text="${c.label}"></option></select></td>
+ <td><input type="text" list="service-list" data-field="description" name="items[0].description" maxlength="100"></td>
+ <td><input type="datetime-local" data-field="serviceDateTime" name="items[0].serviceDateTime"></td>
+ <td><input type="number" data-field="quantity" name="items[0].quantity" min="1" value="1" style="width:70px"></td>
+ <td><input type="number" data-field="unitPrice" name="items[0].unitPrice" step="0.01" min="0" style="width:100px"></td>
+ <td><input type="number" data-field="taxPercent" name="items[0].taxPercent" step="0.01" min="0" max="100" value="0" style="width:70px"></td>
+ <td><input type="number" data-field="discount" name="items[0].discount" step="0.01" min="0" value="0" style="width:90px"></td>
+ <td class="line-total right">0.00</td>
+ <td><button type="button" class="btn small danger remove-item">✕</button></td>
+</tr></th:block>
+    </tbody>
+    <tfoot><tr><td colspan="7" class="right"><strong>Total</strong></td><td class="right"><strong>₹<span id="bill-total">0.00</span></strong></td><td></td></tr></tfoot></table></div>
+    <template id="bill-row-template"><tr class="item-row">
+ <td><select data-field="category" name="items[0].category" style="min-width:130px"><option th:each="c : ${billCategories}" th:value="${c}" th:text="${c.label}"></option></select></td>
+ <td><input type="text" list="service-list" data-field="description" name="items[0].description" maxlength="100"></td>
+ <td><input type="datetime-local" data-field="serviceDateTime" name="items[0].serviceDateTime"></td>
+ <td><input type="number" data-field="quantity" name="items[0].quantity" min="1" value="1" style="width:70px"></td>
+ <td><input type="number" data-field="unitPrice" name="items[0].unitPrice" step="0.01" min="0" style="width:100px"></td>
+ <td><input type="number" data-field="taxPercent" name="items[0].taxPercent" step="0.01" min="0" max="100" value="0" style="width:70px"></td>
+ <td><input type="number" data-field="discount" name="items[0].discount" step="0.01" min="0" value="0" style="width:90px"></td>
+ <td class="line-total right">0.00</td>
+ <td><button type="button" class="btn small danger remove-item">✕</button></td>
+</tr></template>
+    <div class="actions"><button type="button" id="add-item" class="btn small secondary">+ Add item</button></div>
+<div class="field"><label for="notes">Notes</label><textarea th:field="*{notes}" maxlength="300"></textarea><div class="err" th:errors="*{notes}"></div></div>
+    <div class="actions"><button class="btn" type="submit">Save Bill</button><a class="btn secondary" th:href="@{/admin/bills}">Cancel</a></div>
+  </form>
+</div>
+</main>
+<footer th:replace="~{fragments/layout :: foot}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
