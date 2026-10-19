@@ -1,7 +1,7 @@
 package com.hotel.booking.api;
 
 import com.hotel.booking.config.HotelProperties;
-import com.hotel.booking.controller.Lookups;
+import com.hotel.booking.util.Lookups;
 import com.hotel.booking.model.*;
 import com.hotel.booking.service.BillService;
 import com.hotel.booking.service.PaymentService;

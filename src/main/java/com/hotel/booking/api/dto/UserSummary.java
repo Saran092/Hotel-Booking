@@ -20,6 +20,7 @@ public record UserSummary(Long id, String username, String fullName, String emai
     }
 
     public static UserSummary brief(User u) {
+        if (u == null) return null;
         return new UserSummary(u.getId(), u.getUsername(), u.getFullName(), u.getEmail(), u.getCountryCode(),
                 u.getMobile(), null, u.getPrimaryRole().name(),
                 u.getRoles().stream().map(Role::name).sorted().toList(),

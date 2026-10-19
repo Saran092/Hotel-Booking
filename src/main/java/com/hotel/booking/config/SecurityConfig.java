@@ -48,6 +48,7 @@ public class SecurityConfig {
                         "/api/meta", "/error").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/staff/**").hasAnyRole("STAFF", "ADMIN")
+                .requestMatchers("/api/bookings/**", "/api/rooms/**", "/api/complaints/**").hasRole("CUSTOMER")
                 .anyRequest().authenticated())
             .exceptionHandling(e -> e
                 .authenticationEntryPoint(entryPoint)
