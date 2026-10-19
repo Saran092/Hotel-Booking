@@ -49,7 +49,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/staff/**").hasAnyRole("STAFF", "ADMIN")
                 .requestMatchers("/api/bookings/**", "/api/rooms/**", "/api/complaints/**").hasRole("CUSTOMER")
-                .anyRequest().authenticated())
+                .requestMatchers("/", "/index.html", "/favicon.ico", "/*.js", "/*.css",
+                        "/*.map", "/assets/**").permitAll()
+                .requestMatchers("/api/**").authenticated()
+                .anyRequest().permitAll())
             .exceptionHandling(e -> e
                 .authenticationEntryPoint(entryPoint)
                 .accessDeniedHandler(deniedHandler))
